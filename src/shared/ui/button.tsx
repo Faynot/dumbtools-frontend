@@ -1,23 +1,23 @@
 import Link, { LinkProps } from "next/link";
 import { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 
-interface BaseProps {
+type CustomButtonProps = {
   children: ReactNode;
   variant?: "primary" | "secondary" | "outline";
   className?: string;
-}
+};
 
-interface ButtonAsButtonProps
-  extends BaseProps, ButtonHTMLAttributes<HTMLButtonElement> {
-  href?: never;
-}
+type ButtonAsButton = CustomButtonProps &
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
+    href?: never;
+  };
 
-interface ButtonAsLinkProps
-  extends BaseProps, AnchorHTMLAttributes<HTMLAnchorElement> {
-  href: string | LinkProps["href"];
-}
+type ButtonAsLink = CustomButtonProps &
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "children"> & {
+    href: string | LinkProps["href"];
+  };
 
-type ButtonProps = ButtonAsButtonProps | ButtonAsLinkProps;
+type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 export const Button = ({
   children,
@@ -26,7 +26,8 @@ export const Button = ({
   ...props
 }: ButtonProps) => {
   const baseStyles =
-    "inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors";
+    "inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors cursor-pointer";
+
   const variantStyles = {
     primary: "bg-blue-600 text-white hover:bg-blue-700",
     secondary: "bg-slate-200 text-slate-900 hover:bg-slate-300",
@@ -36,17 +37,21 @@ export const Button = ({
   const fullClassName = `${baseStyles} ${variantStyles[variant]} ${className}`;
 
   if ("href" in props && props.href !== undefined) {
-    const { href, ...linkProps } = props as ButtonAsLinkProps;
+    const { href, ...linkProps } = props as ButtonAsLink;
     return (
-      <Link href={href} className={fullClassName} {...linkProps}>
+      <Link href={href} className={fullClassName} {...(linkProps as any)}>
         {children}
       </Link>
     );
   }
 
-  const { ...buttonProps } = props as ButtonAsButtonProps;
+  const { ...buttonProps } = props as ButtonAsButton;
   return (
-    <button className={fullClassName} {...buttonProps}>
+    <button
+      className={fullClassName}
+      {...(buttonProps as any)}
+      type={buttonProps.type || "button"}
+    >
       {children}
     </button>
   );
