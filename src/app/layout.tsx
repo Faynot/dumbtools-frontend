@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Header } from "@/widgets/header";
+import { Footer } from "@/widgets/footer";
 
 export const metadata: Metadata = {
   title: "DumbTools",
@@ -14,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
+        <Header />
         {/* Providers later :p */}
-        {children}
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );
